@@ -1,6 +1,6 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import post_save
+from django.db import models 
+from django.contrib.auth.models import AbstractUser 
+from django.db.models.signals import post_save 
 
 # Create your models here.
 
@@ -9,14 +9,15 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['username'] # 관리자 계정(createsuperuser)을 만들 때 username을 필수입력해야 한다는 뜻
 
     def __str__(self):
         return self.username
     
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
+    user = models.OneToOneField(User, on_delete=models.CASCADE) # User 모델과 1:1 관계를 설정하여 각 유저마다 하나의 프로필이 존재하도록 합니다. on_delete=models.CASCADE는 유저가 삭제될 때 해당 프로필도 함께 삭제되도록 합니다.
+    # user = models.ForeignKey(User, on_delete=models.CASCADE) # ForeignKey는 1:N 관계를 설정하여 한 유저가 여러 프로필을 가질 수 있도록 합니다. 하지만 일반적으로 프로필은 유저당 하나씩 존재하기 때문에 OneToOneField가 더 적합합니다.
+    
     full_name = models.CharField(max_length=300)
     bio = models.CharField(max_length=300, blank=True)
     image = models.ImageField(default='default.jpg', upload_to='user_images')

@@ -4,6 +4,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 
 # 사용자 정보 시리얼라이저
+# Django 안의 데이터를 JSON 형식으로 변환하거나, 반대로 사용자가 보낸 JSON 데이터를 Django 모델 객체로 변환해 주는 도구(Serializer)
+# 웹 개발에서 백엔드(Django)와 프론트엔드(React, 앱 등)가 서로 대화할 때 필수적인 역할
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -16,8 +18,10 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     # 부모 클래스의 메서드를 호출하여 기본적인 JWT(기본적으로 user_id 포함)를 먼저 생성합니다. 
     # 이 시점에서 표준 클레임이 담긴 토큰 객체가 생성.
     def get_token(cls, user):
+        # 1. 기본 토큰 가져오기
         token = super().get_token(user)
-
+        
+        # 2. 토큰에 커스텀 정보(Claim) 추가하기
         # Add custom claims
         # 데이터 삽입: 파이썬 딕셔너리처럼 token['키'] = 값 형태로 원하는 정보를 넣습니다.
         # 주의사항: 여기에 담긴 데이터는 Base64로 인코딩되어 누구나 열어볼 수 있습니다. 
