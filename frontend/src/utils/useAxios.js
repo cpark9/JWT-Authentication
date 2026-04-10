@@ -29,8 +29,13 @@ const useAxios = () => {
     const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 1;
 
     if (!isExpired) {
+      // 만료되지 않았다면 현재 헤더에 다시 한번 토큰을 입혀줍니다 (최신 상태 유지)
+      req.headers.Authorization = `Bearer ${authTokens.access}`;
       return req;
     }
+    // if (!isExpired) {
+    //   return req;
+    // }
 
     // Refresh the access token
     const response = await axios.post(`${baseURL}/token/refresh/`, {

@@ -1,17 +1,18 @@
 import React from 'react'
-import { jwtDecode } from "jwt-decode"
+// import { jwtDecode } from "jwt-decode"
 import AuthContext from '../context/AuthContext'
 import { Link } from 'react-router-dom'
 
 function Navbar() {
 
-  const {user, logoutUser} = React.useContext(AuthContext)
+  // const {user, logoutUser} = React.useContext(AuthContext)
+  const {logoutUser} = React.useContext(AuthContext)
   const token = localStorage.getItem("authTokens")
 
-  if (token){
-    const decoded = jwtDecode(token);
-    var user_id = decoded.user_id
-  }
+  // if (token){
+  //   const decoded = jwtDecode(token);
+  //   var user_id = decoded.user_id
+  // }
 
   return (
     <div>
@@ -40,11 +41,15 @@ function Navbar() {
               }
               {token !== null && 
               <>
+              {/* <a> 태그 : 전체 화면을 새로고침, <Link> 태그 : 페이지 이동 (새로고침 X) */}
                 <li class="nav-item">
                   <a class="nav-link" href="/dashboard">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" onClick={logoutUser} style={{cursor:"pointer"}}>Logout</a>
+                  <Link class="nav-link" to="/todo">Todo</Link>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#!" onClick={logoutUser} style={{cursor:"pointer"}}>Logout</a>
                 </li>
               </>
               }   

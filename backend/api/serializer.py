@@ -1,4 +1,4 @@
-from api.models import User, Profile
+from api.models import User, Profile, Todo
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
@@ -11,28 +11,28 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email']
  
-#   상속: JWT 발급을 담당하는 기본 시리얼라이저를 확장
+#  Django REST Framework(DRF)와 Simple JWT 라이브러리를 사용하여, 
+# 사용자가 로그인할 때 발급되는 JWT(JSON Web Token)와 응답 데이터를 커스텀하는 로직
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     # 클래스 인스턴스 생성 없이 호출되는 메서드로, 첫 번째 인자로 클래스 자체(cls)를 받습니다. Simple JWT 권장
     @classmethod
-    # 부모 클래스의 메서드를 호출하여 기본적인 JWT(기본적으로 user_id 포함)를 먼저 생성합니다. 
-    # 이 시점에서 표준 클레임이 담긴 토큰 객체가 생성.
+
+    # 토큰 내부에 정보 담기
+    # 사용자가 로그인 성공 시 생성되는 JWT 토큰(주로 Access Token)의 Payload(내용물)에 추가 정보를 저장하는 역할
     def get_token(cls, user):
         # 1. 기본 토큰 가져오기
         token = super().get_token(user)
+
+         # 프로필 존재 여부 체크 (안전성 확보)
+        profile = getattr(user, 'profile', None)
         
         # 2. 토큰에 커스텀 정보(Claim) 추가하기
-        # Add custom claims
-        # 데이터 삽입: 파이썬 딕셔너리처럼 token['키'] = 값 형태로 원하는 정보를 넣습니다.
-        # 주의사항: 여기에 담긴 데이터는 Base64로 인코딩되어 누구나 열어볼 수 있습니다. 
-        # 따라서 비밀번호 같은 민감 정보는 절대 넣으면 안 되며, 
-        # 프론트엔드에서 사용자 UI 구성을 위해 바로 필요한 정보(이름, 프로필 이미지 등) 위주로 구성합니다.
         token['full_name'] = user.profile.full_name
         token['username'] = user.username
         token['email'] = user.email
         token['bio'] = user.profile.bio
         # 데이터 변환: str(user.profile.image)처럼 이미지 경로 등을 문자열로 변환하여 JSON 직렬화가 가능하도록 처리합니다.
-        token['image'] = str(user.profile.image)
+        token['image'] = str(user.profile.image) if profile.image else None
         token['verified'] = user.profile.verified
 
         return token
@@ -74,3 +74,36 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+    
+# class TodoSerializer(serializers.ModelSerializer):
+#     # title에 공백 허용 안 함(allow_blank=False) 설정
+#     title = serializers.CharField(required=True, allow_blank=False)
+
+
+#     class Meta:
+#         model = Todo
+#         fields = ['id', 'user', 'title', 'completed']
+#         read_only_fields = ['user'] # 유저 정보는 직접 입력받지 않음
+
+#     #  추가적인 세밀한 검증 (필요한 경우)
+#     def validate_title(self, value):
+#         if len(value) < 2:
+#             raise serializers.ValidationError("제목은 최소 2글자 이상이어야 합니다.")
+#         return value
+
+
+class TodoSerializer(serializers.ModelSerializer):
+    # 1. user는 로그인 정보를 사용하므로 읽기 전용으로 설정
+    # 2. title에 공백 허용 안 함(allow_blank=False) 설정
+    title = serializers.CharField(required=True, allow_blank=False)
+
+    class Meta:
+        model = Todo
+        fields = ['id', 'user', 'title', 'completed']
+        read_only_fields = ['user'] # 유저 정보는 직접 입력받지 않음
+
+    # 3. 추가적인 세밀한 검증 (필요한 경우)
+    def validate_title(self, value):
+        if len(value) < 1:
+            raise serializers.ValidationError("제목은 최소 2글자 이상이어야 합니다.")
+        return value
