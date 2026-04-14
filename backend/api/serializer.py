@@ -1,4 +1,4 @@
-from api.models import User, Profile, Todo
+from api.models import User, Profile, Todo, ChatMessage
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
@@ -75,23 +75,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
     
-# class TodoSerializer(serializers.ModelSerializer):
-#     # title에 공백 허용 안 함(allow_blank=False) 설정
-#     title = serializers.CharField(required=True, allow_blank=False)
-
-
-#     class Meta:
-#         model = Todo
-#         fields = ['id', 'user', 'title', 'completed']
-#         read_only_fields = ['user'] # 유저 정보는 직접 입력받지 않음
-
-#     #  추가적인 세밀한 검증 (필요한 경우)
-#     def validate_title(self, value):
-#         if len(value) < 2:
-#             raise serializers.ValidationError("제목은 최소 2글자 이상이어야 합니다.")
-#         return value
-
-
 class TodoSerializer(serializers.ModelSerializer):
     # 1. user는 로그인 정보를 사용하므로 읽기 전용으로 설정
     # 2. title에 공백 허용 안 함(allow_blank=False) 설정
@@ -107,3 +90,34 @@ class TodoSerializer(serializers.ModelSerializer):
         if len(value) < 1:
             raise serializers.ValidationError("제목은 최소 2글자 이상이어야 합니다.")
         return value
+
+class ProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Profile
+        fields = [ 'id',  'user',  'full_name', 'image' ]
+    
+    def __init__(self, *args, **kwargs):
+        super(ProfileSerializer, self).__init__(*args, **kwargs)
+        request = self.context.get('request')
+        if request and request.method=='POST':
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    reciever_profile = ProfileSerializer(read_only=True)
+    sender_profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = ChatMessage
+        fields = ['id','sender', 'reciever', 'reciever_profile', 'sender_profile' ,'message', 'is_read', 'date']
+    
+    def __init__(self, *args, **kwargs):
+        super(MessageSerializer, self).__init__(*args, **kwargs)
+        request = self.context.get('request')
+        if request and request.method=='POST':
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 2

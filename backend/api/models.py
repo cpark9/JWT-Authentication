@@ -18,11 +18,16 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE) # User 모델과 1:1 관계를 설정하여 각 유저마다 하나의 프로필이 존재하도록 합니다. on_delete=models.CASCADE는 유저가 삭제될 때 해당 프로필도 함께 삭제되도록 합니다.
     # user = models.ForeignKey(User, on_delete=models.CASCADE) # ForeignKey는 1:N 관계를 설정하여 한 유저가 여러 프로필을 가질 수 있도록 합니다. 하지만 일반적으로 프로필은 유저당 하나씩 존재하기 때문에 OneToOneField가 더 적합합니다.
     
-    full_name = models.CharField(max_length=300)
+    full_name = models.CharField(max_length=300, null=True, blank=True)
     bio = models.CharField(max_length=300, blank=True)
     image = models.ImageField(default='default.jpg', upload_to='user_images')
     location = models.CharField(max_length=300, blank=True, null=True)
     verified = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.full_name == "" or self.full_name == None:
+            self.full_name = self.user.username
+        super(Profile, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -58,3 +63,30 @@ class Todo(models.Model):
         return self.title[:30]
     
 
+# Chat App Model
+class ChatMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="user")
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="sender")
+    reciever = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="reciever")
+    
+
+    message = models.CharField(max_length=10000000000)
+
+    is_read = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['date']
+        verbose_name_plural = "Message"
+
+    def __str__(self):
+        return f"{self.sender} - {self.reciever}"
+
+    @property
+    def sender_profile(self):
+        sender_profile = Profile.objects.get(user=self.sender)
+        return sender_profile
+    @property
+    def reciever_profile(self):
+        reciever_profile = Profile.objects.get(user=self.reciever)
+        return reciever_profile

@@ -27,15 +27,15 @@ function Navbar() {
           <div className="collapse navbar-collapse justify-content-start" id="navbarNav">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/">Home</a>
+                <a class="nav-link active" aria-current="page" href="/"> <i className='fas fa-home'></i> Home</a>
               </li>
               {token === null && 
               <>
                 <li class="nav-item">
-                  <a class="nav-link" href="/login">Login</a>
+                  <a class="nav-link" href="/login"> <i className='fas fa-sign-in-alt'></i> Login</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="/register">Register</a>
+                  <a class="nav-link" href="/register"> <i className='fas fa-user-plus'></i> Register</a>
                 </li>
               </>
               }
@@ -43,10 +43,13 @@ function Navbar() {
               <>
               {/* <a> 태그 : 전체 화면을 새로고침, <Link> 태그 : 페이지 이동 (새로고침 X) */}
                 <li class="nav-item">
-                  <a class="nav-link" href="/dashboard">Dashboard</a>
+                  <a class="nav-link" href="/dashboard"> <i className='fas fa-th'></i> Dashboard</a>
                 </li>
                 <li class="nav-item">
-                  <Link class="nav-link" to="/todo">Todo</Link>
+                  <Link class="nav-link" to="/todo"> <i className='fas fa-pen'></i> Todo</Link>
+                </li>
+                <li class="nav-item">
+                  <Link class="nav-link" to="/inbox"> <i className='fas fa-envelope'></i> Inbox</Link>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#!" onClick={logoutUser} style={{cursor:"pointer"}}>Logout</a>

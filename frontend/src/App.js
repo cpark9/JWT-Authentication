@@ -11,6 +11,9 @@ import Loginpage from './views/Loginpage'
 import Registerpage from './views/Registerpage'
 import Navbar from './views/Navbar'
 import Todo from './views/Todo'
+import Message from './views/Message'
+import MessageDetail from './views/MessageDetail'
+import SearchUsers from './views/SearchUsers'
 
 function App() {
   return (
@@ -23,13 +26,21 @@ function App() {
           <Route component={Registerpage} path="/register" exact />
           <Route component={Homepage} path="/" exact />
           <Route component={Todo} path="/todo" exact /> */}
+          {/* <Route component={Message} path="/inbox" exact /> */}
+          {/* <Route component={MessageDetail} path="/inbox/:id" exact /> */}
+          {/* <Route component={SearchUsers} path="/search/:username" exact /> */}
+          {/* 위내용 React Router v5 -> v6 변환 */}
 
-           {/* 보호하고 싶은 페이지는 PrivateRoute로 감싸서 element에 전달  */}
+          {/* 보호하고 싶은 페이지는 PrivateRoute로 감싸서 element에 전달  */}
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/login" element={<Loginpage />} />
           <Route path="/register" element={<Registerpage />} />
           <Route path="/" element={<PrivateRoute><Homepage /></PrivateRoute>} />
           <Route path="/todo" element={<PrivateRoute><Todo /></PrivateRoute>} />
+          <Route path="/inbox" element={<PrivateRoute><Message /></PrivateRoute>} />
+          {/* <Route path="/inbox/:id" element={<PrivateRoute><MessageDetail /></PrivateRoute>} />
+          <Route path="/search/:username" element={<PrivateRoute><SearchUsers /></PrivateRoute>} /> */}
+
         </Routes>
       </AuthProvider>
     </Router>

@@ -7,13 +7,11 @@ function Dashboard() {
   const [res, setRes] = useState("")
   const api = useAxios();
   const token = localStorage.getItem("authTokens")
+  let username = "";
 
   if (token){
     const decode = jwtDecode(token)
-    var user_id = decode.user_id
-    var username = decode.username
-    var full_name = decode.full_name
-    var image = decode.image
+    username = decode.username
   }
 
   useEffect(() => {
@@ -27,21 +25,11 @@ function Dashboard() {
       }
     }
     fetchData()
-  }, [])
+  }, [api])
 
   
-  useEffect(() => {
-    const fetchPostData = async () => {
-      try{
-        const response = await api.post("/test/")
-        setRes(response.data.response)
-      } catch (error) {
-        console.log(error);
-        setRes("Something went wrong")
-      }
-    }
-    fetchPostData()
-  }, [])
+// POST 요청이 필요한 별도의 로직이 아니라면, 동일한 endpoint에 대해 중복된 useEffect는 제거하거나 
+// 별도의 state(예: postRes)를 사용하는 것이 좋습니다.
 
 
   return (

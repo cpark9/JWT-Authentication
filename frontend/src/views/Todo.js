@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback } from 'react'
+import {useState, useEffect } from 'react'
 import useAxios from '../utils/useAxios'
 // import jwtDecode from 'jwt-decode'
 import { jwtDecode } from 'jwt-decode';
@@ -10,8 +10,12 @@ function Todo() {
     const api = useAxios()
 
     const token = localStorage.getItem("authTokens") // 233704237huhweioyop;yrwriweyrwe
-    const decoded = jwtDecode(token)
-    const user_id = decoded.user_id
+    let user_id = null;
+    
+    if (token) {
+        const decoded = jwtDecode(token)
+        user_id = decoded.user_id
+    }
 
     const [todo, setTodo] = useState([])
     useEffect(() => {
@@ -147,7 +151,7 @@ function Todo() {
                             <div className="row" id="todo-container">
                                 {todo.map((todo) => 
                                 
-                                <div className="col col-12 p-2 todo-item">
+                                <div className="col col-12 p-2 todo-item" key={todo.id}>
                                     <div className="input-group">
                                         {todo.completed.toString() === "true" && 
                                             <p className="form-control"><strike>{todo.title}</strike></p>
